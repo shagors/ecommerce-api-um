@@ -2,6 +2,8 @@ import User from "../model/User.js";
 import bcrypt from "bcryptjs";
 import asyncHandler from "express-async-handler";
 import generateToken from "../utils/generateToken.js";
+import { getTokenFromHeader } from "../utils/getTokenFromHeader.js";
+import { verifyToken } from "../utils/verifyToken.js";
 
 // user register controller
 export const registerUserCtrl = asyncHandler(async (req, res) => {
@@ -48,4 +50,15 @@ export const loginUserCtrl = asyncHandler(async (req, res) => {
   } else {
     throw new Error("Invalid user or password");
   }
+});
+
+// single user find
+export const getUserProfileCtrl = asyncHandler(async (req, res) => {
+  //find the user
+  const user = await User.findById(req.userAuthId);
+  res.json({
+    status: "success",
+    message: "User profile fetched successfully",
+    user,
+  });
 });
