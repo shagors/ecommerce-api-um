@@ -1,6 +1,7 @@
 import User from "../model/User.js";
 import bcrypt from "bcryptjs";
 import asyncHandler from "express-async-handler";
+import generateToken from "../utils/generateToken.js";
 
 // user register controller
 export const registerUserCtrl = asyncHandler(async (req, res) => {
