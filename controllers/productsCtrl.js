@@ -32,13 +32,61 @@ export const createProductCtrl = asyncHandler(async (req, res) => {
 
 //get products from server
 export const getProductsCtrl = asyncHandler(async (req, res) => {
-  const products = await Product.find();
-  if (!products) {
-    throw new Error("Prouducts not found");
+  // query
+  let productQuery = Product.find();
+
+  //search by name
+  if (req.query.name) {
+    productQuery = productQuery.find({
+      name: { $regex: req.query.name, $options: "i" },
+    });
   }
+
+  //filter by brand
+  if (req.query.brand) {
+    productQuery = productQuery.find({
+      brand: { $regex: req.query.brand, $options: "i" },
+    });
+  }
+
+  //filter by category
+  if (req.query.category) {
+    productQuery = productQuery.find({
+      category: { $regex: req.query.category, $options: "i" },
+    });
+  }
+
+  //filter by color
+  if (req.query.color) {
+    productQuery = productQuery.find({
+      colors: { $regex: req.query.color, $options: "i" },
+    });
+  }
+
+  //filter by size
+  if (req.query.size) {
+    productQuery = productQuery.find({
+      sizes: { $regex: req.query.size, $options: "i" },
+    });
+  }
+
+  //filter by price range
+  if (req.query.price) {
+    const priceRange = req.query.price.split("-");
+    //gte: greater or equal
+    //lte: less than or equal to
+    productQuery = productQuery.find({
+      price: { $gte: priceRange[0], $lte: priceRange[1] },
+    });
+  }
+
+  const products = await productQuery;
+
   res.json({
     status: "success",
     message: "Products fetched successfully",
     products,
   });
 });
+
+//
