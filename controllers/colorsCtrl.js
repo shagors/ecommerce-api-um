@@ -1,5 +1,4 @@
 import asyncHandler from "express-async-handler";
-import Brand from "../model/Brand.js";
 import Color from "../model/Color.js";
 
 // Create new Color
@@ -12,7 +11,7 @@ export const createColorCtrl = asyncHandler(async (req, res) => {
   }
   //create
   const color = await Color.create({
-    name: name.toLowerCase(),
+    name: name?.toLowerCase(),
     user: req.userAuthId,
   });
 

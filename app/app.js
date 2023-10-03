@@ -8,6 +8,7 @@ import productsRoutes from "../routes/productsRoute.js";
 import categoriesRouter from "../routes/categoriesRouter.js";
 import brandsRouter from "../routes/brandsRoute.js";
 import colorRouter from "../routes/colorRoute.js";
+import reviewRouter from "../routes/reviewRouter.js";
 
 dotenv.config();
 // db connection
@@ -21,6 +22,7 @@ app.use("/api/v1/products", productsRoutes);
 app.use("/api/v1/categories", categoriesRouter);
 app.use("/api/v1/brands", brandsRouter);
 app.use("/api/v1/colors", colorRouter);
+app.use("/api/v1/reviews", reviewRouter);
 
 // error middleware
 app.use(notFound);
