@@ -62,3 +62,42 @@ export const getUserProfileCtrl = asyncHandler(async (req, res) => {
     user,
   });
 });
+
+// Update user shipping address
+export const updateShippingAddresctrl = asyncHandler(async (req, res) => {
+  const {
+    firstName,
+    lastName,
+    address,
+    city,
+    postalCode,
+    province,
+    phone,
+    country,
+  } = req.body;
+  const user = await User.findByIdAndUpdate(
+    req.userAuthId,
+    {
+      shippingAddress: {
+        firstName,
+        lastName,
+        address,
+        city,
+        postalCode,
+        province,
+        phone,
+        country,
+      },
+      hasShippingAddress: true,
+    },
+    {
+      new: true,
+    }
+  );
+  //send response
+  res.json({
+    status: "success",
+    message: "User shipping address updated successfully",
+    user,
+  });
+});
