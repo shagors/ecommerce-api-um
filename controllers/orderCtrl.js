@@ -11,8 +11,25 @@ const stripe = new Stripe(process.env.STRIPE_KEY);
 
 // create orders
 export const createOrderCtrl = asyncHandler(async (req, res) => {
+  // //get teh coupon
+  // const { coupon } = req?.query;
+
+  // const couponFound = await Coupon.findOne({
+  //   code: coupon?.toUpperCase(),
+  // });
+  // if (couponFound?.isExpired) {
+  //   throw new Error("Coupon has expired");
+  // }
+  // if (!couponFound) {
+  //   throw new Error("Coupon does exists");
+  // }
+
+  //get discount
+  // const discount = couponFound?.discount / 100;
+
   //Get the payload(customer, orderItems, shipppingAddress, totalPrice);
   const { orderItems, shippingAddress, totalPrice } = req.body;
+  // console.log(req.body);
   //Find the user
   const user = await User.findById(req.userAuthId);
   //Check if user has shipping address
@@ -23,7 +40,6 @@ export const createOrderCtrl = asyncHandler(async (req, res) => {
   if (orderItems?.length <= 0) {
     throw new Error("No Order Items");
   }
-
   //Place/create order - save into DB
   const order = await Order.create({
     user: user?._id,
@@ -45,7 +61,6 @@ export const createOrderCtrl = asyncHandler(async (req, res) => {
     }
     await product.save();
   });
-
   //push order into user
   user.orders.push(order?._id);
   await user.save();
@@ -66,19 +81,7 @@ export const createOrderCtrl = asyncHandler(async (req, res) => {
     };
   });
   const session = await stripe.checkout.sessions.create({
-    line_items: [
-      {
-        price_data: {
-          currency: "usd",
-          product_data: {
-            name: "bag",
-            description: "best bag",
-          },
-          unit_amount: 10 * 100,
-        },
-        quantity: 2,
-      },
-    ],
+    line_items: convertedOrders,
     metadata: {
       orderId: JSON.stringify(order?._id),
     },
@@ -87,5 +90,49 @@ export const createOrderCtrl = asyncHandler(async (req, res) => {
     cancel_url: "http://localhost:3000/cancel",
   });
   res.send({ url: session.url });
-  //   res.json({ success: true, message: "Order created", order, user });
+});
+
+//  get all orders
+export const getAllordersCtrl = asyncHandler(async (req, res) => {
+  //find all orders
+  const orders = await Order.find().populate("user");
+  res.json({
+    success: true,
+    message: "All orders",
+    orders,
+  });
+});
+
+// get single order
+export const getSingleOrderCtrl = asyncHandler(async (req, res) => {
+  //get the id from params
+  const id = req.params.id;
+  const order = await Order.findById(id);
+  //send response
+  res.status(200).json({
+    success: true,
+    message: "Single order",
+    order,
+  });
+});
+
+// update order to delivered
+export const updateOrderCtrl = asyncHandler(async (req, res) => {
+  //get the id from params
+  const id = req.params.id;
+  //update
+  const updatedOrder = await Order.findByIdAndUpdate(
+    id,
+    {
+      status: req.body.status,
+    },
+    {
+      new: true,
+    }
+  );
+  res.status(200).json({
+    success: true,
+    message: "Order updated",
+    updatedOrder,
+  });
 });
